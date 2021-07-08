@@ -53,7 +53,7 @@ def get_datasets():
     isic_zipped = list(zip(isic_derm, isic_mask))
     merged_list = ph2_zipped + isic_zipped + dermofit_zipped
     np.random.shuffle(merged_list)
-    # merged_list = merged_list[:1000]
+    # merged_list = merged_list[:500]
     train_data = merged_list[:int(0.7 * len(merged_list))]
     val_data = merged_list[int(0.7 * len(merged_list)):]
 

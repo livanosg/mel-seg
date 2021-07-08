@@ -1,5 +1,8 @@
+import cv2
 import numpy as np
+import tensorflow as tf
 import tensorflow.keras.backend as K
+
 from tensorflow.python.keras.callbacks import Callback
 
 
@@ -114,3 +117,25 @@ class CyclicLR(Callback):
         self.history.setdefault('iterations', []).append(self.trn_iterations)
 
         K.set_value(self.model.optimizer.lr, self.clr())
+
+
+class WriteImages(Callback):
+    def __init__(self, logs):
+        super().__init__()
+        self.logs = logs
+        self.epoch = 0
+
+    def on_epoch_begin(self, epoch, logs=None):
+        self.epoch = epoch
+
+    def on_batch_end(self, batch, logs=None):
+        if batch % 10 == 0:
+            test = cv2.imread(
+                "/home/livanosg/projects/mel-seg/data/ph2/data/IMD002/IMD002_Dermoscopic_Image/IMD002.png")
+            output = self.model.predict(tf.expand_dims(
+                tf.image.per_image_standardization(tf.image.resize_with_pad(test, target_height=224, target_width=224)),
+                axis=0))
+            writer = tf.summary.create_file_writer(logdir=self.logs)
+            with writer.as_default(batch):
+                tf.summary.image("Output", data=tf.expand_dims(output[:, :, :, 1], axis=-1), step=batch + self.epoch * 40)
+            tf.summary.flush()

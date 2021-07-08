@@ -20,7 +20,7 @@ def weighted_crossentropy(y_true, y_pred):  # todo fix weights shape
     class_freq = tf.math.maximum(class_freq, [1, 1])
     weights = tf.math.pow(tf.math.divide(tf.reduce_sum(class_freq), class_freq), 0.5)
     weights = tf.reduce_sum(y_true * weights, axis=-1)
-    return tf.math.reduce_sum(tf.keras.losses.categorical_crossentropy(y_true=y_true, y_pred=y_pred) * weights)
+    return tf.math.reduce_mean(tf.keras.losses.categorical_crossentropy(y_true=y_true, y_pred=y_pred) * weights)
 
 
 def log_dice_loss(y_true, y_pred):
@@ -32,7 +32,7 @@ def log_dice_loss(y_true, y_pred):
         numerator = tf.reduce_sum(y_true * y_pred, axis=[0, 1, 2])
         denominator = tf.reduce_sum(y_true + y_pred, axis=[0, 1, 2])
         dice = (2 * weights * (numerator + 1)) / (weights * (denominator + 1))
-    return tf.math.reduce_sum(- tf.math.log(dice))
+    return tf.math.reduce_mean(- tf.math.log(dice))
 
 
 def custom_loss(y_true, y_pred):
